@@ -33,7 +33,7 @@
   [self.view.layer addSublayer:self.sunLayer];
   self.sunLayer.backgroundColor = [UIColor purpleColor].CGColor;
   self.sunLayer.frame = CGRectMake(0, 0, 70, 70);
-  self.sunLayer.cornerRadius = self.sunLayer.frame.size.width;// / 2;
+  self.sunLayer.cornerRadius = self.sunLayer.frame.size.width / 2;
 }
 
 - (void)setupEarthLayer {
@@ -41,7 +41,7 @@
   [self.sunLayer addSublayer:self.earthLayer];
   self.earthLayer.backgroundColor = [UIColor blueColor].CGColor;
   self.earthLayer.frame = CGRectMake(0, 0, 30, 30);
-  self.earthLayer.cornerRadius = self.earthLayer.frame.size.width / 3;
+  self.earthLayer.cornerRadius = self.earthLayer.frame.size.width / 2;
 }
 
 - (void)setupMoonLayer {
@@ -49,7 +49,7 @@
   [self.earthLayer addSublayer:self.moonLayer];
   self.moonLayer.backgroundColor = [UIColor lightGrayColor].CGColor;
   self.moonLayer.frame = CGRectMake(0, 0, 10, 10);
-  self.moonLayer.cornerRadius = self.moonLayer.frame.size.width / 6;
+  self.moonLayer.cornerRadius = self.moonLayer.frame.size.width / 2;
 }
 
 - (void)viewDidLayoutSubviews {
@@ -59,7 +59,7 @@
 
   CGPoint center = CGPointMake(self.sunLayer.bounds.size.width / 2,
                                self.sunLayer.bounds.size.height / 2);
-  self.earthOrbit = [UIBezierPath bezierPathWithArcCenter:center radius:150 startAngle:0
+  self.earthOrbit = [UIBezierPath bezierPathWithArcCenter:center radius:130 startAngle:0
                                                  endAngle:2 * M_PI clockwise:YES];
   CAKeyframeAnimation* earthOrbitAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
   earthOrbitAnimation.path = self.earthOrbit.CGPath;
