@@ -82,7 +82,7 @@
 
   // 3) Emitter things.
 
-//  [self sunEmitterSetup];
+  [self sunEmitterSetup];
 }
 
 #pragma mark -
@@ -184,21 +184,21 @@
 
   CAEmitterLayer *emitterLayer = [CAEmitterLayer layer]; // 1
   emitterLayer.emitterPosition =
-      CGPointMake(self.sunView.frame.origin.x, self.sunView.frame.origin.y); // 2
-  //  emitterLayer.emitterZPosition = 10; // 3
+      CGPointMake(self.view.bounds.origin.x + 30, self.view.bounds.origin.y + 30); // 2
+  emitterLayer.emitterZPosition = -40; // 3
   emitterLayer.emitterSize =
-      CGSizeMake(self.sunView.frame.size.width, self.sunView.frame.size.height); // 4
-  emitterLayer.emitterShape = kCAEmitterLayerLine; //kCAEmitterLayerSphere; // 5
+      CGSizeMake(2, 2); // 4
+  emitterLayer.emitterShape = kCAEmitterLayerSphere; //kCAEmitterLayerSphere; // 5
   CAEmitterCell *emitterCell = [CAEmitterCell emitterCell]; // 6
-  emitterCell.scale = 0.1; // 7
-  emitterCell.scaleRange = M_PI * 2.0; // 8
+  emitterCell.scale = 0.0001; // 7
+  emitterCell.scaleRange = 0.03; // 8
     emitterCell.emissionRange = (CGFloat)M_PI_2 * 2; // 9
   emitterCell.lifetime = 5.0; // 10
-  emitterCell.birthRate = 10; // 11
-  emitterCell.velocity = 200; // 12
+  emitterCell.birthRate = 1000; // 11
+  emitterCell.velocity = 20; // 12
   emitterCell.velocityRange = 50; // 13
-  emitterCell.yAcceleration = 250; // 14
-  emitterCell.contents = (id)[[UIImage imageNamed:@"yellow dot.jpg"] CGImage]; // 15
+  emitterCell.yAcceleration = 0; // 14
+  emitterCell.contents = (id)[[UIImage imageNamed:@"gooDot.png"] CGImage]; // 15
   emitterLayer.emitterCells = @[emitterCell]; // 16
   emitterLayer.beginTime = CACurrentMediaTime();
   [self.sunView.layer addSublayer:emitterLayer]; // 17
