@@ -1,5 +1,5 @@
 // Copyright (c) 2017 Lightricks. All rights reserved.
-// Created by Reuven Siman Tov.
+// Created by Nimrod Gruber.
 
 #import <UIKit/UIKit.h>
 

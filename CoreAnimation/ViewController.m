@@ -1,5 +1,5 @@
 // Copyright (c) 2017 Lightricks. All rights reserved.
-// Created by Reuven Nimrod Gruber.
+// Created by Nimrod Gruber.
 
 #import "ViewController.h"
 
@@ -11,9 +11,11 @@
 @property (strong, nonatomic) UIView *earthView;
 @property (strong, nonatomic) UIView *moonView;
 
-@property (strong, nonatomic, nullable) CALayer *sunLayer;
-@property (strong, nonatomic, nullable) CALayer *earthLayer;
-@property (strong, nonatomic, nullable) CALayer *moonLayer;
+@property (strong, nonatomic)UIImageView *sunImage;
+
+//@property (strong, nonatomic, nullable) CALayer *sunLayer;
+//@property (strong, nonatomic, nullable) CALayer *earthLayer;
+//@property (strong, nonatomic, nullable) CALayer *moonLayer;
 
 @property (strong, nonatomic, nullable) UIBezierPath *sunOrbit;
 @property (strong, nonatomic, nullable) UIBezierPath *earthOrbit;
@@ -31,34 +33,57 @@
   self.view.backgroundColor = [UIColor blackColor];
   self.stopPlanetMovement = NO;
 
-  [self setupSunLayer];
-  [self setupEarthLayer];
-  [self setupMoonLayer];
+  [self setupSun];
+  [self setupEarth];
+  [self setupMoon];
 }
 
-- (void)setupSunLayer {
+- (void)setupSun {
   self.sunView = [[UIView alloc] init];
-  self.sunLayer = [[CALayer alloc] init];
+//  self.sunLayer = [[CALayer alloc] init];
 
   [self.view addSubview:self.sunView];
-  [self.view.layer addSublayer:self.sunView.layer];
-  self.sunView.layer.frame = CGRectMake(0, 0, 140, 140);
+//  self.sunView.backgroundColor = [UIColor redColor];
+  self.sunView.frame =
+      CGRectMake(self.view.center.x-70, self.view.center.y-70, 140, 140); // this ruins sun position. idky.
+      //CGRectMake(0, 0, 140, 140);
+
+//  self.sunView.layer.position = CGPointMake(self.view.center.x, self.view.center.y);
+
+//  [self.view.layer addSublayer:self.sunView.layer];
   self.sunView.layer.cornerRadius = self.sunView.layer.frame.size.width / 2;
 
-  UIImageView *sunImage = [[UIImageView alloc] init];
-  sunImage.image = [UIImage imageNamed:@"sun.png"];
-  [self.sunView addSubview:sunImage];
-  sunImage.frame = self.sunView.layer.frame;
+  CGImageRef imageRef =[UIImage imageNamed:@"sun.png"].CGImage;
+  self.sunView.layer.contents = (__bridge id _Nullable)([UIImage imageNamed:@"sun.png"].CGImage);
+  self.sunView.layer.contentsGravity = kCAGravityCenter;
+//  [CATransaction flush];
+//  self.sunImage = [[UIImageView alloc] init];
+
+//  self.sunImage = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 140, 140)];
+//  self.sunImage.image = [UIImage imageNamed:@"sun.png"];
+//  [self.sunView addSubview:self.sunImage];
+
+//    [self.view addSubview:sunImage];
+//  sunImage.frame = self.sunView.layer.frame;
+//  self.sunImage.frame = //self.sunView.frame;
+//      CGRectMake(self.view.center.x-70, self.view.center.y-70, 140, 140);
+//      CGRectMake(0, 0, 140, 140);
+//  [self.sunImage convertPoint:CGPointZero toView:self.sunView];
+
 }
 
-- (void)setupEarthLayer {
+- (void)setupEarth {
   self.earthView = [[UIView alloc] init];
-  self.earthLayer = [[CALayer alloc] init];
+//  self.earthLayer = [[CALayer alloc] init];
 
   [self.view addSubview:self.earthView];
   [self.sunView.layer addSublayer:self.earthView.layer];
-//  self.earthView.layer.backgroundColor = [UIColor blueColor].CGColor;
-  self.earthView.layer.frame = CGRectMake(0, 0, 60, 60);
+  self.earthView.layer.frame =
+//      CGRectMake(self.sunView.center.x, self.sunView.center.y, 60, 60);
+      CGRectMake(0, 0, 60, 60);
+
+//  self.earthView.layer.position = CGPointMake(self.sunView.center.x, self.sunView.center.y);
+
   self.earthView.layer.cornerRadius = self.earthView.layer.frame.size.width / 2;
 
   UIImageView *earthImage = [[UIImageView alloc] init];
@@ -67,14 +92,18 @@
   earthImage.frame = self.earthView.layer.frame;
 }
 
-- (void)setupMoonLayer {
+- (void)setupMoon {
   self.moonView= [[UIView alloc] init];
-  self.moonLayer = [[CALayer alloc] init];
+//  self.moonLayer = [[CALayer alloc] init];
 
   [self.earthView addSubview:self.moonView];
   [self.earthView.layer addSublayer:self.moonView.layer];
-//  self.moonView.layer.backgroundColor = [UIColor lightGrayColor].CGColor;
-  self.moonView.layer.frame = CGRectMake(0, 0, 20, 20);
+  self.moonView.layer.frame =
+//      CGRectMake(self.earthView.center.x, self.earthView.center.y, 20, 20);
+      CGRectMake(0, 0, 20, 20);
+
+//  self.moonView.layer.position = CGPointMake(self.earthView.center.x, self.earthView.center.y);
+
   self.moonView.layer.cornerRadius = self.moonView.layer.frame.size.width / 2;
 
   UIImageView *moonImage = [[UIImageView alloc] init];
@@ -88,7 +117,7 @@
 
   // 1) Planetary rotations.
 
-  self.sunView.layer.position = self.view.center;
+//  self.sunView.layer.position = self.view.center;
 
   [self createSunAnimationWithStartingPoint:0];
   [self createEarthAnimationWithStartingPoint:0];
@@ -116,50 +145,135 @@
 
 // CALayer* layerThatWasTapped = [line.layer hitTest:[gestureRecognizer locationInView:line]];
 - (void)handleTap:(UITapGestureRecognizer *)sender {
-  // Tap earth.
+  CGPoint touchPoint = [sender locationInView:self.view];
+  
+  NSLog(@"TouchPoint:%@", NSStringFromCGPoint(touchPoint));
+  NSLog(@"Moon Frame:%@", NSStringFromCGRect(self.moonView.frame));
+  NSLog(@"Moon Layer:%@", NSStringFromCGRect(self.moonView.layer.frame));
+  NSLog(@"Earth Frame:%@", NSStringFromCGRect(self.earthView.frame));
+  NSLog(@"Earth Layer:%@", NSStringFromCGRect(self.earthView.layer.frame));
+  NSLog(@"Sun Frame:%@", NSStringFromCGRect(self.sunView.frame));
+  NSLog(@"Sun Layer:%@", NSStringFromCGRect(self.sunView.layer.frame));
+  NSLog(@"Sun Image Frame:%@", NSStringFromCGRect(self.sunImage.frame));
+  NSLog(@"***********");
 
+//  if ([self.earthView.layer containsPoint:CGPointZero]) {
+//    [self pauseResumeConstellation];
+//  }
+//
+//  if ([self.sunView.layer containsPoint:touchPoint]) {
+//    [self resetConstellation];
+//  }
+
+//  if ([self.earthView.layer hitTest:[sender locationInView:self.earthView]]) {
+//    [self pauseResumeConstellation];
+//  }
+//
+//  if ([self.sunView.layer hitTest:[sender locationInView:self.sunView]]) {
+//    [self resetConstellation];
+//  }
+
+  if (CGRectContainsPoint(self.earthView.frame, touchPoint)){
+    [self pauseResumeConstellation];
+  }
+
+  if (CGRectContainsPoint(self.sunView.frame, touchPoint)){
+    [self resetConstellation];
+  }
+
+  // Tap earth.
+//  self.stopPlanetMovement = !self.stopPlanetMovement;
+//  CALayer *sunPosition = self.sunView.layer.presentationLayer;
+//  CALayer *earthPosition = self.earthView.layer.presentationLayer;
+//  CALayer *moonPosition = self.moonLayer.presentationLayer;
+//
+//  if (self.stopPlanetMovement) {
+//    self.sunView.layer.position = sunPosition.position;
+//    [self.sunView.layer removeAllAnimations];
+//    self.sunView.layer.transform = earthPosition.presentationLayer.transform;
+//
+//    self.earthView.layer.position = earthPosition.position;
+//    [self.earthView.layer removeAllAnimations];
+//    self.earthView.layer.transform = earthPosition.presentationLayer.transform;
+//
+//    self.moonLayer.frame = moonPosition.frame;
+//    [self.moonView.layer removeAllAnimations];
+//    self.moonLayer.transform = moonPosition.presentationLayer.transform;
+////    [self.view layoutIfNeeded];
+//  } else {
+//    [self createSunAnimationWithStartingPoint:[sunPosition.presentationLayer position].x];
+//    [self createEarthAnimationWithStartingPoint:[earthPosition.presentationLayer position].x];
+//    [self createMoonAnimationWithStartingPoint:[moonPosition.presentationLayer position].x];
+//  }
+
+  // Tap sun.
+//  CABasicAnimation* selectionAnimation = [CABasicAnimation
+//                                          animationWithKeyPath:@"backgroundColor"];
+//  selectionAnimation.toValue = self.stopPlanetMovement ? (id)[UIColor redColor].CGColor :
+//      (id)[UIColor yellowColor].CGColor;
+//  [self.sunView.layer addAnimation:selectionAnimation forKey:@"selectionAnimation"];
+//
+//  self.sunView.layer.backgroundColor = self.stopPlanetMovement ? [UIColor redColor].CGColor :
+//      [UIColor yellowColor].CGColor;
+//
+//  CATransition* transition = [CATransition animation];
+//  transition.startProgress = 0;
+//  transition.endProgress = 1.0;
+//  transition.type = kCATransitionFade;
+//  transition.subtype = kCATransitionFade;
+//  transition.duration = 1.0;
+//
+//  [self.sunView.layer addAnimation:transition forKey:@"transition"];
+}
+
+- (void)pauseResumeConstellation {
   self.stopPlanetMovement = !self.stopPlanetMovement;
-  CALayer *sunPosition = self.sunView.layer.presentationLayer;
+//  CALayer *sunPosition = self.sunView.layer.presentationLayer;
   CALayer *earthPosition = self.earthView.layer.presentationLayer;
-  CALayer *moonPosition = self.moonLayer.presentationLayer;
+  CALayer *moonPosition = self.moonView.layer.presentationLayer;//moonLayer.presentationLayer;
 
   if (self.stopPlanetMovement) {
-    self.sunView.layer.position = sunPosition.position;
-    [self.sunView.layer removeAllAnimations];
-    self.sunView.layer.transform = earthPosition.presentationLayer.transform;
+//    self.sunView.layer.position = sunPosition.position;
+//    [self.sunView.layer removeAllAnimations];
+//    self.sunView.layer.transform = sunPosition.presentationLayer.transform;
 
-    self.earthView.layer.position = earthPosition.position;
+    self.earthView.layer.position = earthPosition.frame.origin;//.position;
     [self.earthView.layer removeAllAnimations];
     self.earthView.layer.transform = earthPosition.presentationLayer.transform;
 
-    self.moonLayer.frame = moonPosition.frame;
+    self.moonView.layer.frame /*moonLayer.frame*/ = moonPosition.frame;
     [self.moonView.layer removeAllAnimations];
-    self.moonLayer.transform = moonPosition.presentationLayer.transform;
-//    [self.view layoutIfNeeded];
+    self.moonView.layer.transform /*moonLayer.transform*/ = moonPosition.presentationLayer.transform;
   } else {
-    [self createSunAnimationWithStartingPoint:[sunPosition.presentationLayer position].x];
+//    [self createSunAnimationWithStartingPoint:[sunPosition.presentationLayer position].x];
     [self createEarthAnimationWithStartingPoint:[earthPosition.presentationLayer position].x];
     [self createMoonAnimationWithStartingPoint:[moonPosition.presentationLayer position].x];
   }
+}
 
-  // Tap sun.
-  CABasicAnimation* selectionAnimation = [CABasicAnimation
-                                          animationWithKeyPath:@"backgroundColor"];
-  selectionAnimation.toValue = self.stopPlanetMovement ? (id)[UIColor redColor].CGColor :
-      (id)[UIColor yellowColor].CGColor;
-  [self.sunView.layer addAnimation:selectionAnimation forKey:@"selectionAnimation"];
+- (void)resetConstellation {
+//  CABasicAnimation* selectionAnimation = [CABasicAnimation
+//                                          animationWithKeyPath:@"backgroundColor"];
+//  selectionAnimation.toValue = self.stopPlanetMovement ? (id)[UIColor redColor].CGColor :
+//  (id)[UIColor yellowColor].CGColor;
+//  [self.sunView.layer addAnimation:selectionAnimation forKey:@"selectionAnimation"];
+//
+//  self.sunView.layer.backgroundColor = self.stopPlanetMovement ? [UIColor redColor].CGColor :
+//  [UIColor yellowColor].CGColor;
+//
+//  CATransition* transition = [CATransition animation];
+//  transition.startProgress = 0;
+//  transition.endProgress = 1.0;
+//  transition.type = kCATransitionFade;
+//  transition.subtype = kCATransitionFade;
+//  transition.duration = 1.0;
+//
+//  [self.sunView.layer addAnimation:transition forKey:@"transition"];
+  [self.sunView.layer removeAllAnimations];
+  [self.earthView.layer removeAllAnimations];
+  [self.moonView.layer removeAllAnimations];
+  self.earthView.layer.frame = CGRectZero;
 
-  self.sunView.layer.backgroundColor = self.stopPlanetMovement ? [UIColor redColor].CGColor :
-      [UIColor yellowColor].CGColor;
-
-  CATransition* transition = [CATransition animation];
-  transition.startProgress = 0;
-  transition.endProgress = 1.0;
-  transition.type = kCATransitionFade;
-  transition.subtype = kCATransitionFade;
-  transition.duration = 1.0;
-
-  [self.sunView.layer addAnimation:transition forKey:@"transition"];
 }
 
 //- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -234,12 +348,27 @@
   emitterCell.lifetime = 5.0;
   emitterCell.birthRate = 900;
   emitterCell.velocity = 20;
-  emitterCell.velocityRange = 50;
+  emitterCell.velocityRange = 500;
   emitterCell.yAcceleration = 0;
   emitterCell.contents = (id)[[UIImage imageNamed:@"sun.png"] CGImage];
-  emitterLayer.emitterCells = @[emitterCell];
+
+//  CAEmitterCell *emitterCell2 = [CAEmitterCell emitterCell];
+//  emitterCell2.scale = 0.0001;
+//  emitterCell2.scaleRange = 0.01;
+//  emitterCell2.emissionRange = (CGFloat)M_PI_2 * 6;
+//  emitterCell2.lifetime = 5.0;
+//  emitterCell2.birthRate = 300;
+//  emitterCell2.velocity = 20;
+//  emitterCell2.velocityRange = 500;
+//  emitterCell2.yAcceleration = 0;
+//  emitterCell2.contents = (id)[[UIImage imageNamed:@"gooDot.png"] CGImage];
+
+  emitterLayer.emitterCells = @[emitterCell, /*emitterCell2*/];
   emitterLayer.beginTime = CACurrentMediaTime();
   [self.sunView.layer addSublayer:emitterLayer];
+//  [self.sunView.layer insertSublayer:emitterLayer below:self.sunView.layer];
+//  [self.sunView.layer insertSublayer:emitterLayer above:self.sunView.layer];
+//  [self.view.layer insertSublayer:emitterLayer below:self.sunView.layer];
 }
 
 @end
